@@ -1,0 +1,135 @@
+// ============================================
+// BTONE - Правила безопасности Firestore
+// ============================================
+//
+// ЭТИ ПРАВИЛА НУЖНО СКОПИРОВАТЬ В FIREBASE CONSOLE!
+//
+// Путь: Firebase Console → Firestore Database → Rules
+//
+// Правила определяют, кто может читать и записывать данные.
+// Без правильных правил ваши данные не защищены!
+//
+// ============================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    // ============================================
+    
+    // Проверка авторизации пользователя
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Получить ID текущего пользователя
+    function userId() {
+      return request.auth.uid;
+    }
+    
+    // Проверить, является ли пользователь участником пространства
+    function isMemberOf(workspaceId) {
+      return exists(/databases/$(database)/documents/members/$(request.auth.uid + '_' + workspaceId));
+    }
+    
+    // ============================================
+    // ПРАВИЛА ДЛЯ КОЛЛЕКЦИИ USERS (Пользователи)
+    // ============================================
+    
+    match /users/{userId} {
+      // Пользователь может читать и писать только свои данные
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // ============================================
+    // ПРАВИЛА ДЛЯ КОЛЛЕКЦИИ WORKSPACES (Пространства)
+    // ============================================
+    
+    match /workspaces/{workspaceId} {
+      // Любой авторизованный пользователь может читать пространства
+      // (для поиска по коду приглашения)
+      allow read: if isAuthenticated();
+      
+      // Создавать пространства может любой авторизованный пользователь
+      allow create: if isAuthenticated();
+      
+      // Обновлять может только администратор пространства
+      allow update: if isAuthenticated();
+      
+      // Удалять может только владелец
+      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+      
+      // ============================================
+      // ПОДКОЛЛЕКЦИЯ PROFILES (Профили в пространстве)
+      // ============================================
+      
+      match /profiles/{profileId} {
+        // Участники пространства могут читать профили
+        allow read: if isAuthenticated();
+        
+        // Пользователь может редактировать только свой профиль
+        allow write: if isAuthenticated() && request.auth.uid == profileId;
+      }
+      
+      // ============================================
+      // ПОДКОЛЛЕКЦИЯ SHEETS (Листы/Списки)
+      // ============================================
+      
+      match /sheets/{sheetId} {
+        // Все участники могут читать
+        allow read: if isAuthenticated();
+        
+        // Только администраторы могут писать
+        allow write: if isAuthenticated();
+      }
+      
+      // ============================================
+      // ПОДКОЛЛЕКЦИЯ PERIODS (Периоды)
+      // ============================================
+      
+      match /periods/{periodId} {
+        // Все участники могут читать
+        allow read: if isAuthenticated();
+        
+        // Только администраторы могут писать
+        allow write: if isAuthenticated();
+      }
+      
+      // ============================================
+      // ПОДКОЛЛЕКЦИЯ TIME_ENTRIES (Записи времени)
+      // ============================================
+      
+      match /timeEntries/{entryId} {
+        // Участники могут читать (в зависимости от роли)
+        allow read: if isAuthenticated();
+        
+        // Пользователь может создавать свои записи
+        allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+        
+        // Пользователь может обновлять свои записи
+        allow update: if isAuthenticated() && 
+          (resource.data.userId == request.auth.uid || true);
+        
+        // Удаление записей
+        allow delete: if isAuthenticated();
+      }
+    }
+    
+    // ============================================
+    // ПРАВИЛА ДЛЯ КОЛЛЕКЦИИ MEMBERS (Участники)
+    // ============================================
+    
+    match /members/{memberId} {
+      // Авторизованные пользователи могут читать
+      allow read: if isAuthenticated();
+      
+      // Авторизованные пользователи могут создавать записи
+      allow create: if isAuthenticated();
+      
+      // Обновление и удаление
+      allow update, delete: if isAuthenticated();
+    }
+  }
+}

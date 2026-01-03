@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <!-- ===== МЕТА-ТЕГИ ===== -->
+    <!-- Кодировка страницы - UTF-8 поддерживает русский язык -->
+    <meta charset="UTF-8">
+    
+    <!-- Viewport - ОЧЕНЬ ВАЖНО для мобильных устройств! -->
+    <!-- width=device-width - ширина страницы = ширине экрана устройства -->
+    <!-- initial-scale=1.0 - начальный масштаб 100% -->
+    <!-- maximum-scale=1.0 - запрещаем увеличение (для PWA это стандарт) -->
+    <!-- user-scalable=no - запрещаем масштабирование пальцами -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Описание приложения для поисковиков и соцсетей -->
+    <meta name="description" content="BTONE - Приложение для учёта рабочего времени">
+    
+    <!-- Цвет темы браузера на мобильных устройствах -->
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <!-- Для Apple устройств - режим полноэкранного приложения -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BTONE">
+    
+    <!-- Заголовок страницы - отображается на вкладке браузера -->
+    <title>BTONE - Учёт рабочего времени</title>
+    
+    <!-- ===== ПОДКЛЮЧЕНИЕ СТИЛЕЙ ===== -->
+    <!-- Основные стили приложения -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- ===== PWA МАНИФЕСТ ===== -->
+    <!-- Манифест описывает приложение для установки на устройство -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- ===== ИКОНКИ ===== -->
+    <!-- Иконка для закладок и вкладок браузера -->
+    <link rel="icon" type="image/png" sizes="32x32" href="images/icon-32.png">
+    <!-- Иконка для Apple устройств -->
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    
+    <!-- ===== ШРИФТЫ ===== -->
+    <!-- Подключаем красивый шрифт Nunito из Google Fonts -->
+    <!-- Nunito - округлый, дружелюбный шрифт, хорошо читается на мобильных -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- ===== КОНТЕЙНЕР ПРИЛОЖЕНИЯ ===== -->
+    <!-- Весь интерфейс приложения находится внутри этого контейнера -->
+    <div id="app" class="app-container">
+        
+        <!-- ===== ЭКРАН ЗАГРУЗКИ ===== -->
+        <!-- Показывается пока приложение загружается -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-content">
+                <!-- Логотип приложения -->
+                <div class="loading-logo">
+                    <span class="logo-text">BTONE</span>
+                </div>
+                <!-- Анимированный индикатор загрузки -->
+                <div class="loading-spinner"></div>
+                <!-- Текст под спиннером -->
+                <p class="loading-text">Загрузка...</p>
+            </div>
+        </div>
+        
+        <!-- ===== ЭКРАН АВТОРИЗАЦИИ ===== -->
+        <!-- Показывается когда пользователь не вошёл в систему -->
+        <div id="auth-screen" class="screen auth-screen hidden">
+            
+            <!-- Заголовок экрана авторизации -->
+            <div class="auth-header">
+                <h1 class="auth-logo">BTONE</h1>
+                <p class="auth-subtitle">Учёт рабочего времени</p>
+            </div>
+            
+            <!-- Контейнер для формы входа/регистрации -->
+            <div class="auth-form-container">
+                
+                <!-- Переключатель между входом и регистрацией -->
+                <div class="auth-tabs">
+                    <!-- Кнопка "Вход" - активна по умолчанию -->
+                    <button id="tab-login" class="auth-tab active" data-tab="login">
+                        Вход
+                    </button>
+                    <!-- Кнопка "Регистрация" -->
+                    <button id="tab-register" class="auth-tab" data-tab="register">
+                        Регистрация
+                    </button>
+                </div>
+                
+                <!-- ===== ФОРМА ВХОДА ===== -->
+                <form id="login-form" class="auth-form">
+                    <!-- Поле Email -->
+                    <div class="form-group">
+                        <label for="login-email" class="form-label">Email</label>
+                        <input 
+                            type="email" 
+                            id="login-email" 
+                            class="form-input" 
+                            placeholder="example@mail.com"
+                            required
+                            autocomplete="email"
+                        >
+                    </div>
+                    
+                    <!-- Поле Пароль -->
+                    <div class="form-group">
+                        <label for="login-password" class="form-label">Пароль</label>
+                        <input 
+                            type="password" 
+                            id="login-password" 
+                            class="form-input" 
+                            placeholder="Введите пароль"
+                            required
+                            autocomplete="current-password"
+                            minlength="6"
+                        >
+                    </div>
+                    
+                    <!-- Кнопка входа -->
+                    <button type="submit" class="btn btn-primary btn-full">
+                        Войти
+                    </button>
+                </form>
+                
+                <!-- ===== ФОРМА РЕГИСТРАЦИИ ===== -->
+                <!-- Скрыта по умолчанию, показывается при клике на "Регистрация" -->
+                <form id="register-form" class="auth-form hidden">
+                    <!-- Поле Имя -->
+                    <div class="form-group">
+                        <label for="register-name" class="form-label">Имя</label>
+                        <input 
+                            type="text" 
+                            id="register-name" 
+                            class="form-input" 
+                            placeholder="Ваше имя"
+                            required
+                            autocomplete="name"
+                        >
+                    </div>
+                    
+                    <!-- Поле Email -->
+                    <div class="form-group">
+                        <label for="register-email" class="form-label">Email</label>
+                        <input 
+                            type="email" 
+                            id="register-email" 
+                            class="form-input" 
+                            placeholder="example@mail.com"
+                            required
+                            autocomplete="email"
+                        >
+                    </div>
+                    
+                    <!-- Поле Пароль -->
+                    <div class="form-group">
+                        <label for="register-password" class="form-label">Пароль</label>
+                        <input 
+                            type="password" 
+                            id="register-password" 
+                            class="form-input" 
+                            placeholder="Минимум 6 символов"
+                            required
+                            autocomplete="new-password"
+                            minlength="6"
+                        >
+                    </div>
+                    
+                    <!-- Поле Подтверждение пароля -->
+                    <div class="form-group">
+                        <label for="register-password-confirm" class="form-label">Подтвердите пароль</label>
+                        <input 
+                            type="password" 
+                            id="register-password-confirm" 
+                            class="form-input" 
+                            placeholder="Повторите пароль"
+                            required
+                            autocomplete="new-password"
+                            minlength="6"
+                        >
+                    </div>
+                    
+                    <!-- Кнопка регистрации -->
+                    <button type="submit" class="btn btn-primary btn-full">
+                        Зарегистрироваться
+                    </button>
+                </form>
+                
+                <!-- Контейнер для сообщений об ошибках -->
+                <div id="auth-error" class="auth-error hidden"></div>
+                
+            </div>
+        </div>
+        
+        <!-- ===== ГЛАВНЫЙ ЭКРАН (СПИСОК ПРОСТРАНСТВ) ===== -->
+        <!-- Показывается после входа в систему -->
+        <div id="workspaces-screen" class="screen workspaces-screen hidden">
+            
+            <!-- Заголовок экрана пространств -->
+            <div class="workspaces-header">
+                <h1 class="workspaces-title">Пространства</h1>
+                <!-- Кнопка выхода из аккаунта -->
+                <button id="logout-btn" class="btn-icon" title="Выйти">
+                    <!-- SVG иконка выхода -->
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Строка поиска/создания пространства -->
+            <div class="workspace-search-container">
+                <input 
+                    type="text" 
+                    id="workspace-input" 
+                    class="workspace-input" 
+                    placeholder="Введите название или код (BT-xxxxx)"
+                >
+                <!-- Кнопка создания/присоединения -->
+                <button id="workspace-action-btn" class="btn btn-primary">
+                    Создать
+                </button>
+            </div>
+            
+            <!-- Подсказка для пользователя -->
+            <p class="workspace-hint">
+                Введите название для создания нового пространства или код приглашения (BT-xxxxx) для присоединения
+            </p>
+            
+            <!-- Список пространств пользователя -->
+            <div id="workspaces-list" class="workspaces-list">
+                <!-- Пространства будут добавляться динамически через JavaScript -->
+                <!-- Пример структуры одного пространства: -->
+                <!--
+                <div class="workspace-card" data-workspace-id="xxx">
+                    <div class="workspace-info">
+                        <h3 class="workspace-name">Название пространства</h3>
+                        <p class="workspace-members">5 участников</p>
+                    </div>
+                    <button class="btn-icon workspace-leave" title="Покинуть">
+                        <svg>...</svg>
+                    </button>
+                </div>
+                -->
+            </div>
+            
+            <!-- Сообщение когда нет пространств -->
+            <div id="no-workspaces" class="no-workspaces">
+                <div class="no-workspaces-icon">
+                    <!-- SVG иконка папки -->
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <h3>У вас пока нет пространств</h3>
+                <p>Создайте новое пространство или присоединитесь по коду приглашения</p>
+            </div>
+            
+        </div>
+        
+        <!-- ===== ОСНОВНОЙ ЭКРАН ПРОСТРАНСТВА ===== -->
+        <!-- Показывается после выбора пространства -->
+        <div id="main-screen" class="screen main-screen hidden">
+            
+            <!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ===== -->
+            <header class="top-bar">
+                <!-- Кнопка "Назад" к списку пространств -->
+                <button id="back-btn" class="btn-icon" title="Назад">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                
+                <!-- Информация о пространстве -->
+                <div class="workspace-info-bar">
+                    <span id="current-workspace-name" class="current-workspace-name">Название</span>
+                    <span id="members-count" class="members-count">0 чел.</span>
+                </div>
+                
+                <!-- Правая часть - кнопки настроек -->
+                <div class="top-bar-actions">
+                    <!-- Переключатель языка -->
+                    <button id="lang-toggle" class="btn-icon" title="Язык">
+                        <span class="lang-label">RU</span>
+                    </button>
+                    <!-- Переключатель темы -->
+                    <button id="theme-toggle" class="btn-icon" title="Тема">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- ===== ОБЛАСТЬ КОНТЕНТА ===== -->
+            <!-- Здесь отображается содержимое выбранной вкладки -->
+            <main id="content-area" class="content-area">
+                
+                <!-- Вкладка "Профиль" (Home) -->
+                <section id="tab-home" class="tab-content active">
+                    <div class="profile-container">
+                        <h2 class="section-title">Мой профиль</h2>
+                        
+                        <!-- Аватар пользователя -->
+                        <div class="profile-avatar">
+                            <div class="avatar-placeholder">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        <!-- Форма профиля -->
+                        <form id="profile-form" class="profile-form">
+                            <div class="form-group">
+                                <label for="profile-name" class="form-label">Имя</label>
+                                <input type="text" id="profile-name" class="form-input" placeholder="Ваше имя">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profile-position" class="form-label">Должность</label>
+                                <input type="text" id="profile-position" class="form-input" placeholder="Ваша должность">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profile-email" class="form-label">Email</label>
+                                <input type="email" id="profile-email" class="form-input" placeholder="email@example.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profile-phone" class="form-label">Телефон</label>
+                                <input type="tel" id="profile-phone" class="form-input" placeholder="+7 (999) 123-45-67">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profile-telegram" class="form-label">Telegram</label>
+                                <input type="url" id="profile-telegram" class="form-input" placeholder="https://t.me/username">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-full">
+                                Сохранить
+                            </button>
+                        </form>
+                    </div>
+                </section>
+                
+                <!-- Вкладка "Участники" -->
+                <section id="tab-members" class="tab-content">
+                    <h2 class="section-title">Участники</h2>
+                    <div id="members-list" class="members-list">
+                        <!-- Участники будут добавляться динамически -->
+                    </div>
+                </section>
+                
+                <!-- Вкладка "Часы работы" -->
+                <section id="tab-hours" class="tab-content">
+                    <h2 class="section-title">Часы работы</h2>
+                    <div class="hours-container">
+                        <!-- Форма ввода часов и календарь недели -->
+                        <p class="placeholder-text">Раздел в разработке</p>
+                    </div>
+                </section>
+                
+                <!-- Вкладка "Отчёты" -->
+                <section id="tab-reports" class="tab-content">
+                    <h2 class="section-title">Отчёты</h2>
+                    <div class="reports-container">
+                        <!-- Статистика и отчёты -->
+                        <p class="placeholder-text">Раздел в разработке</p>
+                    </div>
+                </section>
+                
+                <!-- Вкладка "Настройки" (только для админов) -->
+                <section id="tab-settings" class="tab-content">
+                    <h2 class="section-title">Настройки</h2>
+                    <div class="settings-container">
+                        <!-- Настройки пространства -->
+                        <p class="placeholder-text">Раздел в разработке</p>
+                    </div>
+                </section>
+                
+            </main>
+            
+            <!-- ===== НИЖНЯЯ НАВИГАЦИЯ ===== -->
+            <nav id="bottom-nav" class="bottom-nav">
+                <!-- Кнопка "Профиль" -->
+                <button class="nav-btn active" data-tab="home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Профиль</span>
+                </button>
+                
+                <!-- Кнопка "Участники" -->
+                <button class="nav-btn" data-tab="members">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span>Участники</span>
+                </button>
+                
+                <!-- Кнопка "Часы" -->
+                <button class="nav-btn" data-tab="hours">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Часы</span>
+                </button>
+                
+                <!-- Кнопка "Отчёты" -->
+                <button class="nav-btn" data-tab="reports">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    <span>Отчёты</span>
+                </button>
+                
+                <!-- Кнопка "Настройки" (скрыта по умолчанию, видна только админам) -->
+                <button class="nav-btn nav-admin hidden" data-tab="settings">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Настройки</span>
+                </button>
+            </nav>
+            
+        </div>
+        
+        <!-- ===== ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ ===== -->
+        <div id="toast-container" class="toast-container"></div>
+        
+    </div>
+    
+    <!-- ===== ПОДКЛЮЧЕНИЕ СКРИПТОВ ===== -->
+    <!-- 
+        Firebase SDK подключается через CDN (Content Delivery Network).
+        Это значит что мы загружаем библиотеку Firebase с серверов Google.
+        Версия 10.x - последняя стабильная версия Firebase.
+    -->
+    
+    <!-- Firebase App - основной модуль -->
+    <script type="module" src="js/firebase-config.js"></script>
+    
+    <!-- Основной скрипт приложения -->
+    <script type="module" src="js/app.js"></script>
+    
+    <!-- Регистрация Service Worker для PWA -->
+    <script>
+        // Service Worker - это скрипт, который работает в фоне
+        // Он позволяет приложению работать офлайн и отправлять уведомления
+        
+        // Проверяем, поддерживает ли браузер Service Worker
+        if ('serviceWorker' in navigator) {
+            // Когда страница полностью загрузилась
+            window.addEventListener('load', function() {
+                // Регистрируем Service Worker
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        // Успешная регистрация
+                        console.log('Service Worker зарегистрирован:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        // Ошибка регистрации
+                        console.log('Ошибка регистрации Service Worker:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

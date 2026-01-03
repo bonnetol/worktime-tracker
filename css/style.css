@@ -1,0 +1,912 @@
+/* ============================================
+   BTONE - Стили приложения для учёта времени
+   ============================================
+   
+   СТРУКТУРА ФАЙЛА:
+   1. CSS Переменные (цвета, размеры)
+   2. Сброс стилей
+   3. Базовые стили
+   4. Экран загрузки
+   5. Экран авторизации
+   6. Экран пространств
+   7. Основной экран
+   8. Верхняя панель
+   9. Нижняя навигация
+   10. Компоненты форм
+   11. Карточки и списки
+   12. Уведомления
+   13. Анимации
+   14. Светлая тема
+   
+   ============================================ */
+
+
+/* ============================================
+   1. CSS ПЕРЕМЕННЫЕ
+   ============================================
+   CSS переменные (Custom Properties) позволяют:
+   - Легко менять цвета во всём приложении
+   - Быстро переключаться между темами
+   - Переиспользовать значения
+   
+   Синтаксис: --имя-переменной: значение;
+   Использование: var(--имя-переменной)
+   ============================================ */
+
+:root {
+    /* === ЦВЕТА ТЁМНОЙ ТЕМЫ (по умолчанию) === */
+    
+    /* Основные цвета фона */
+    --color-bg-primary: #0f0f1a;        /* Самый тёмный фон */
+    --color-bg-secondary: #1a1a2e;      /* Фон карточек */
+    --color-bg-tertiary: #252542;       /* Фон полей ввода */
+    
+    /* Цвета текста */
+    --color-text-primary: #ffffff;      /* Основной текст */
+    --color-text-secondary: #a0a0b8;    /* Второстепенный текст */
+    --color-text-muted: #6c6c80;        /* Приглушённый текст */
+    
+    /* Акцентные цвета */
+    --color-accent: #6c5ce7;            /* Основной акцент (фиолетовый) */
+    --color-accent-hover: #5b4cdb;      /* Акцент при наведении */
+    --color-accent-light: rgba(108, 92, 231, 0.15); /* Лёгкий акцент */
+    
+    /* Цвета состояний */
+    --color-success: #00d26a;           /* Успех (зелёный) */
+    --color-warning: #ffc107;           /* Предупреждение (жёлтый) */
+    --color-error: #ff6b6b;             /* Ошибка (красный) */
+    --color-info: #00b4d8;              /* Информация (голубой) */
+    
+    /* Границы и разделители */
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-border-focus: rgba(108, 92, 231, 0.5);
+    
+    /* Тени */
+    --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-large: 0 8px 32px rgba(0, 0, 0, 0.5);
+    
+    /* === РАЗМЕРЫ === */
+    
+    /* Отступы */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Скругления углов */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;    /* Полное скругление (круг) */
+    
+    /* Размеры элементов */
+    --height-input: 48px;     /* Высота полей ввода */
+    --height-button: 48px;    /* Высота кнопок */
+    --height-top-bar: 56px;   /* Высота верхней панели */
+    --height-bottom-nav: 64px; /* Высота нижней навигации */
+    
+    /* Шрифты */
+    --font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-md: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 24px;
+    --font-size-xxl: 32px;
+    
+    /* Анимации */
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 350ms ease;
+}
+
+
+/* ============================================
+   2. СБРОС СТИЛЕЙ
+   ============================================
+   Убираем стандартные отступы браузера и
+   устанавливаем box-sizing: border-box
+   (размеры элемента включают padding и border)
+   ============================================ */
+
+*,
+*::before,
+*::after {
+    /* Размеры элемента включают padding и border */
+    box-sizing: border-box;
+    /* Убираем все отступы по умолчанию */
+    margin: 0;
+    padding: 0;
+}
+
+/* Убираем стандартные стили списков */
+ul, ol {
+    list-style: none;
+}
+
+/* Убираем подчёркивание ссылок */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Кнопки и поля ввода наследуют шрифт */
+button, input, textarea, select {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+/* Убираем стандартную рамку у кнопок и полей */
+button {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+
+/* ============================================
+   3. БАЗОВЫЕ СТИЛИ
+   ============================================ */
+
+/* Запрещаем прокрутку body (прокрутка внутри app) */
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-md);
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+    
+    /* Улучшаем отображение шрифтов */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    
+    /* Запрещаем выделение текста (для PWA) */
+    -webkit-user-select: none;
+    user-select: none;
+    
+    /* Запрещаем тап-подсветку на iOS */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Контейнер приложения - занимает весь экран */
+.app-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Скрытый элемент */
+.hidden {
+    display: none !important;
+}
+
+/* Экраны приложения */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--color-bg-primary);
+}
+
+
+/* ============================================
+   4. ЭКРАН ЗАГРУЗКИ
+   ============================================ */
+
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+    z-index: 9999;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.loading-logo {
+    margin-bottom: var(--spacing-lg);
+}
+
+.logo-text {
+    font-size: 48px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-accent) 0%, #a29bfe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 4px;
+}
+
+/* Анимированный спиннер загрузки */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto var(--spacing-md);
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+
+/* ============================================
+   5. ЭКРАН АВТОРИЗАЦИИ
+   ============================================ */
+
+.auth-screen {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+}
+
+.auth-header {
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+}
+
+.auth-logo {
+    font-size: var(--font-size-xxl);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-accent) 0%, #a29bfe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 3px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.auth-subtitle {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-md);
+}
+
+.auth-form-container {
+    flex: 1;
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Вкладки Вход/Регистрация */
+.auth-tabs {
+    display: flex;
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    margin-bottom: var(--spacing-lg);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.auth-tab.active {
+    background-color: var(--color-accent);
+    color: var(--color-text-primary);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.auth-error {
+    padding: var(--spacing-md);
+    background-color: rgba(255, 107, 107, 0.1);
+    border: 1px solid var(--color-error);
+    border-radius: var(--radius-sm);
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    margin-top: var(--spacing-md);
+}
+
+
+/* ============================================
+   6. ЭКРАН ПРОСТРАНСТВ
+   ============================================ */
+
+.workspaces-screen {
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+}
+
+.workspaces-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-lg);
+}
+
+.workspaces-title {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+}
+
+.workspace-search-container {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.workspace-input {
+    flex: 1;
+    height: var(--height-input);
+    padding: 0 var(--spacing-md);
+    background-color: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-md);
+    transition: border-color var(--transition-fast);
+}
+
+.workspace-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+.workspace-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.workspace-hint {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    margin-bottom: var(--spacing-lg);
+}
+
+.workspaces-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+/* Карточка пространства */
+.workspace-card {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.workspace-card:hover {
+    background-color: var(--color-bg-tertiary);
+}
+
+.workspace-card:active {
+    transform: scale(0.98);
+}
+
+.workspace-info {
+    flex: 1;
+}
+
+.workspace-name {
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.workspace-members {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.workspace-leave {
+    color: var(--color-text-muted);
+    padding: var(--spacing-sm);
+}
+
+.workspace-leave:hover {
+    color: var(--color-error);
+}
+
+/* Сообщение "Нет пространств" */
+.no-workspaces {
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    color: var(--color-text-secondary);
+}
+
+.no-workspaces-icon {
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-md);
+}
+
+.no-workspaces h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-primary);
+}
+
+.no-workspaces p {
+    font-size: var(--font-size-sm);
+}
+
+
+/* ============================================
+   7. ОСНОВНОЙ ЭКРАН
+   ============================================ */
+
+.main-screen {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Область контента между панелями */
+.content-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--spacing-md);
+    padding-top: calc(var(--height-top-bar) + var(--spacing-md));
+    padding-bottom: calc(var(--height-bottom-nav) + var(--spacing-md));
+}
+
+/* Вкладки контента */
+.tab-content {
+    display: none;
+    animation: fadeIn var(--transition-normal);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-title {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    margin-bottom: var(--spacing-lg);
+}
+
+
+/* ============================================
+   8. ВЕРХНЯЯ ПАНЕЛЬ
+   ============================================ */
+
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--height-top-bar);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--spacing-sm);
+    background-color: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+    z-index: 100;
+}
+
+.workspace-info-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 0 var(--spacing-sm);
+}
+
+.current-workspace-name {
+    font-weight: 600;
+    font-size: var(--font-size-md);
+}
+
+.members-count {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    padding: 2px 8px;
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-full);
+}
+
+.top-bar-actions {
+    display: flex;
+    align-items: center;
+}
+
+.lang-label {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+}
+
+
+/* ============================================
+   9. НИЖНЯЯ НАВИГАЦИЯ
+   ============================================ */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--height-bottom-nav);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-border);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    z-index: 100;
+}
+
+.nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: var(--spacing-sm);
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+    min-width: 60px;
+}
+
+.nav-btn span {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.nav-btn.active {
+    color: var(--color-accent);
+}
+
+.nav-btn:not(.active):hover {
+    color: var(--color-text-secondary);
+}
+
+
+/* ============================================
+   10. КОМПОНЕНТЫ ФОРМ
+   ============================================ */
+
+/* Группа поля формы */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+/* Метка поля */
+.form-label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+}
+
+/* Поле ввода */
+.form-input {
+    height: var(--height-input);
+    padding: 0 var(--spacing-md);
+    background-color: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-md);
+    transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+
+.form-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* Кнопки */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--height-button);
+    padding: 0 var(--spacing-lg);
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.btn-primary {
+    background-color: var(--color-accent);
+    color: var(--color-text-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-accent-hover);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+}
+
+
+/* ============================================
+   11. КАРТОЧКИ И СПИСКИ
+   ============================================ */
+
+/* Профиль */
+.profile-container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.profile-avatar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.avatar-placeholder {
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg-tertiary);
+    border-radius: 50%;
+    color: var(--color-text-muted);
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+/* Список участников */
+.members-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.member-card {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-md);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.member-card:hover {
+    background-color: var(--color-bg-tertiary);
+}
+
+.member-avatar {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg-tertiary);
+    border-radius: 50%;
+    margin-right: var(--spacing-md);
+    color: var(--color-text-muted);
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+}
+
+.member-info {
+    flex: 1;
+}
+
+.member-name {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.member-position {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+/* Заглушка для разделов в разработке */
+.placeholder-text {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: var(--spacing-xl);
+}
+
+
+/* ============================================
+   12. УВЕДОМЛЕНИЯ (Toast)
+   ============================================ */
+
+.toast-container {
+    position: fixed;
+    bottom: calc(var(--height-bottom-nav) + var(--spacing-md));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    width: calc(100% - var(--spacing-lg) * 2);
+    max-width: 400px;
+    pointer-events: none;
+}
+
+.toast {
+    padding: var(--spacing-md);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-medium);
+    text-align: center;
+    font-size: var(--font-size-sm);
+    animation: toastIn var(--transition-normal) ease;
+    pointer-events: auto;
+}
+
+.toast.success {
+    border-left: 4px solid var(--color-success);
+}
+
+.toast.error {
+    border-left: 4px solid var(--color-error);
+}
+
+.toast.info {
+    border-left: 4px solid var(--color-info);
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.toast.hiding {
+    animation: toastOut var(--transition-normal) ease forwards;
+}
+
+@keyframes toastOut {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+
+/* ============================================
+   13. АНИМАЦИИ
+   ============================================ */
+
+/* Плавное появление экранов */
+.screen {
+    animation: screenIn var(--transition-slow) ease;
+}
+
+@keyframes screenIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* ============================================
+   14. СВЕТЛАЯ ТЕМА
+   ============================================
+   Для переключения темы добавляем класс .light-theme к body
+   и переопределяем CSS переменные
+   ============================================ */
+
+body.light-theme {
+    --color-bg-primary: #f5f5f7;
+    --color-bg-secondary: #ffffff;
+    --color-bg-tertiary: #e8e8ed;
+    
+    --color-text-primary: #1a1a2e;
+    --color-text-secondary: #6c6c80;
+    --color-text-muted: #a0a0b8;
+    
+    --color-border: rgba(0, 0, 0, 0.1);
+    
+    --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-large: 0 8px 32px rgba(0, 0, 0, 0.16);
+}
+
+
+/* ============================================
+   15. АДАПТИВ ДЛЯ БОЛЬШИХ ЭКРАНОВ
+   ============================================ */
+
+@media (min-width: 768px) {
+    /* На планшетах и ПК ограничиваем ширину */
+    .app-container {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: var(--shadow-large);
+    }
+}
